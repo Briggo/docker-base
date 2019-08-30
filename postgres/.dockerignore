@@ -1,0 +1,9 @@
+.git
+.gitignore
+.github
+.gitattributes
+READMETEMPLATE.md
+README.md
+build.env
+run.env
+build
