@@ -1,10 +1,9 @@
 ## Project Metadata
-PROJECT_NAME := briggo-cloud
-STACK_NAME := briggo
-AWS_ACCOUNT := 883675091498
-AWS_REGION := us-east-1
-AWS_ECR := $(AWS_ACCOUNT).dkr.ecr.$(AWS_REGION).amazonaws.com/$(PROJECT_NAME)
-AWS_ARTIFACTS_S3_BUCKET := s3://artifacts.briggo.io.$(AWS_REGION)/$(PROJECT_NAME)
+PROJECT_NAME ?= cloud-stack
+AWS_ACCOUNT ?= 883675091498
+AWS_REGION ?= us-east-1
+AWS_ECR ?= $(AWS_ACCOUNT).dkr.ecr.$(AWS_REGION).amazonaws.com/$(PROJECT_NAME)
+AWS_ARTIFACTS_S3_BUCKET ?= s3://artifacts.briggo.io.$(AWS_REGION)/$(PROJECT_NAME)
 
 ## Docker Container Versions used for Tagging
 RABBITMQ_TAG=:latest
