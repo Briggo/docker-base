@@ -6,7 +6,7 @@ AWS_REGION := us-east-1
 AWS_ECR := $(AWS_ACCOUNT).dkr.ecr.$(AWS_REGION).amazonaws.com/$(PROJECT_NAME)
 AWS_ARTIFACTS_S3_BUCKET := s3://artifacts.briggo.io.$(AWS_REGION)/$(PROJECT_NAME)
 
-## Docker Container Versions
+## Docker Container Versions used for Tagging
 RABBITMQ_TAG=:latest
 POSTGRES_BACKUP_TAG=:latest
 POSTGRES_TAG=:latest
