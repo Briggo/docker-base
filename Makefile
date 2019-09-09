@@ -200,6 +200,7 @@ docker-push.%: prereqs-docker aws-login docker-build.% ## Pushes a specific cont
 	echo "DATE=${DATETIME}" >> ${BUILD_DIR_REL}${SLASH}manifest && \
 	echo "GIT_BRANCH=$(BRANCH)" >> ${BUILD_DIR_REL}${SLASH}manifest; \
 	done < ${BUILD_DIR_REL}${SLASH}digest && \
+	grep -q sha256 digest || exit 1 && \
 	rm ${BUILD_DIR_REL}${SLASH}digest;
 	@echo "$(OK_COLOR)$@.................................[DONE]$(NO_COLOR)"
 
