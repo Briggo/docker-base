@@ -1,9 +1,9 @@
 ## Project Metadata
 PROJECT_NAME ?= cloud-stack
-AWS_ACCOUNT ?= 883675091498
+AWS_ACCOUNT_ID ?= 556085509259
 AWS_REGION ?= us-east-1
-AWS_ECR ?= $(AWS_ACCOUNT).dkr.ecr.$(AWS_REGION).amazonaws.com/$(PROJECT_NAME)
-AWS_ARTIFACTS_S3_BUCKET ?= s3://artifacts.briggo.io.$(AWS_REGION)/$(PROJECT_NAME)
+IMAGE_REPO_NAME ?= $(AWS_ACCOUNT_ID).dkr.ecr.$(AWS_REGION).amazonaws.com/$(PROJECT_NAME)
+AWS_ARTIFACTS_S3_BUCKET ?= s3://artifacts.int.build.briggo.io/$(PROJECT_NAME)
 
 ## Docker Container Versions used for Tagging
 RABBITMQ_TAG=:latest
@@ -90,7 +90,7 @@ __check_defined_FORCE:
 
 .PHONY: aws-login
 aws-login: ## Generates AWS ECR Login script
-	@echo $(shell aws ecr get-login --no-include-email --region us-east-1 | sh)
+	@echo $(shell aws ecr get-login --no-include-email --region us-east-1 --registry-ids $(AWS_ACCOUNT_ID) | sh)
 
 
 $(ENV_FILE): ## Generates the development version of the "$(ENV_FILE)" file
@@ -120,7 +120,7 @@ DOCKER_COMPOSE_VERSION := $(shell docker-compose --version 2>/dev/null)
 AWSCLI_VERSION := $(shell aws --version 2>/dev/null)
 AWSCLI_CP := aws s3 cp
 AWS_WHOAMI := $(word 2,$(shell aws opsworks --output text --region us-east-1 describe-my-user-profile 2>/dev/null))
-AWS_AUTH_SUCCESS_TOKEN := arn:aws:iam::$(AWS_ACCOUNT)
+AWS_AUTH_SUCCESS_TOKEN := arn:aws:iam::$(AWS_ACCOUNT_ID)
 
 .PHONY: prereqs-docker
 prereqs-docker: ## Tests to see if the required dependencies are installed
@@ -168,7 +168,7 @@ containers: ## Prints the list of Docker containers that will be built, publishe
 	$(eval CONTAINER=$*)
 	$(eval CONTAINER_TAG=$($(shell echo $(CONTAINER) | tr a-z A-Z | tr - _)_TAG))
 	@echo "$(INFO_COLOR)Processing [$(CONTAINER)]$(NO_COLOR)"
-	$(eval IMAGE:=$(AWS_ECR)$(SLASH)$(CONTAINER)$(CONTAINER_TAG))
+	$(eval IMAGE:=$(IMAGE_REPO_NAME)$(SLASH)$(CONTAINER)$(CONTAINER_TAG))
 	@echo "--> tag:[$(IMAGE)]"
 
 .PHONY: docker-build
@@ -200,8 +200,8 @@ docker-push.%: prereqs-docker aws-login docker-build.% ## Pushes a specific cont
 	echo "DATE=${DATETIME}" >> ${BUILD_DIR_REL}${SLASH}manifest && \
 	echo "GIT_BRANCH=$(BRANCH)" >> ${BUILD_DIR_REL}${SLASH}manifest; \
 	done < ${BUILD_DIR_REL}${SLASH}digest && \
-	grep -q sha256 digest || exit 1 && \
-	rm ${BUILD_DIR_REL}${SLASH}digest;
+	grep -q sha256 digest && \
+	rm ${BUILD_DIR_REL}${SLASH}digest || true;
 	@echo "$(OK_COLOR)$@.................................[DONE]$(NO_COLOR)"
 
 .PHONY: docker-run
