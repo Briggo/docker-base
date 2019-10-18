@@ -48,21 +48,13 @@ RUN @('4.0', '4.5.2', '4.6.2', '4.7.2') \
         Remove-Item -Force referenceassemblies.zip; \
     }
 
-# Install Node
-RUN Invoke-WebRequest -UseBasicParsing https://nodejs.org/dist/v10.16.3/node-v10.16.3-win-x64.zip -OutFile nodejs.zip; \
-    Expand-Archive  -Force nodejs.zip -DestinationPath c:\node; \
-    Remove-Item nodejs.zip -Force; \
-    setx /M PATH $('c:\node\node-v10.16.3-win-x64;{0}' -f $env:PATH)
+# Install Cygwin, NodeJS, Git (minimal, for bash)
+RUN Invoke-WebRequest https://chocolatey.org/install.ps1 -UseBasicParsing | Invoke-Expression
+RUN choco install cygwin nodejs git -y
 
-RUN npm install --global xpm
-RUN npm install --global semver
-RUN xpm install --global @gnu-mcu-eclipse/windows-build-tools
+# Install SemVer and Eclipse Build tools (GNU make)
+RUN npm install --global xpm semver
+RUN xpm install --global @gnu-mcu-eclipse/windows-build-tools; \
+    setx /M PATH $('C:\Users\ContainerAdministrator\AppData\Roaming\xPacks\@gnu-mcu-eclipse\windows-build-tools\2.12.1-1\.content\bin;{0}' -f $env:PATH)
 
-# Install Git
-ADD MinGit-2.23.0-64-bit.zip c:/mingit.zip
-RUN Expand-Archive mingit.zip -DestinationPath c:\mingit; \
-    Remove-Item mingit.zip -Force; \
-    setx /M PATH $('c:\mingit\cmd;{0}' -f $env:PATH)
-
-RUN setx /M PATH $('C:\Users\ContainerAdministrator\AppData\Roaming\xPacks\@gnu-mcu-eclipse\windows-build-tools\2.12.1-1\.content\bin;{0}' -f $env:PATH)
-RUN Enable-WindowsOptionalFeature -Online -FeatureName Microsoft-Windows-Subsystem-Linux
+RUN refreshenv
