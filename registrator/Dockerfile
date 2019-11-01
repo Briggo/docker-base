@@ -1,0 +1,4 @@
+FROM gliderlabs/registrator:master
+
+
+

@@ -5,17 +5,6 @@ AWS_REGION ?= us-east-1
 IMAGE_REPO_NAME ?= $(AWS_ACCOUNT_ID).dkr.ecr.$(AWS_REGION).amazonaws.com/$(PROJECT_NAME)
 AWS_ARTIFACTS_S3_BUCKET ?= s3://artifacts.int.build.briggo.io/$(PROJECT_NAME)
 
-## Docker Container Versions used for Tagging
-RABBITMQ_TAG=:latest
-POSTGRES_BACKUP_TAG=:latest
-POSTGRES_TAG=:latest
-NGINX_TAG=:latest
-LOGSPOUT_TAG=:latest
-CONSUL_TAG=:latest
-VAULT_TAG=:latest
-TLS_GEN_TAG=:latest
-
-
 .PHONY: default
 default:
 	@echo "------------- $(PROJECT_NAME) Makefile Quick Start --------------"
@@ -31,7 +20,6 @@ default:
 usage: ## Prints description of each target
 	@grep -E '^[a-zA-Z_-]+.*:.*?## .*$$' $(MAKEFILE_LIST) | awk 'BEGIN {FS = ":|##"}; {printf "  \033[36m%-15s\033[0m %s. Depends on [%s]\n", $$2, $$4, $$3}'
 
-
 DOLLAR := $$
 SLASH := /
 DOT_SLASH := ./
@@ -41,6 +29,12 @@ EMPTY:=
 SPACE:=$(EMPTY) $(EMPTY)
 QUOTE:=
 DOUBLE_QUOTE:="
+
+BRANCH := $(shell git rev-parse --abbrev-ref HEAD | sed s%$(SLASH)%-%g)
+DATE := $(shell date +%Y%m%d)
+TIME := $(shell date +'%H%M%S')
+DATETIME := $(DATE)-$(TIME)
+TIMESTAMP := $(shell date +%s)
 
 ENV_FILE := .env
 DOCKER_PARENT_DIR_NAME :=
@@ -66,11 +60,6 @@ WARN_STRING=$(WARN_COLOR)[WARNINGS]$(NO_COLOR)
 ################################################################################
 ## House Keeping and Prerequisites Check
 ################################################################################
-BRANCH := $(shell git rev-parse --abbrev-ref HEAD | sed s%$(SLASH)%-%g)
-DATE := $(shell date +%Y%m%d)
-TIME := $(shell date +'%H%M%S')
-DATETIME := $(DATE)-$(TIME)
-TIMESTAMP := $(shell date +%s)
 
 check_defined ?= \
     $(strip $(foreach 1,$1, \
@@ -158,6 +147,17 @@ CONTAINER_DIRS = $(sort $(dir $(wildcard $(DOCKER_DIR_REL)$(SLASH)*$(SLASH))))
 CONTAINERS_NEXT = $(foreach CONTAINER,$(CONTAINER_DIRS),$(filter-out $(DOCKER_DIR_REL),$(subst $(DOCKER_DIR_REL)$(SLASH),,$(subst $(SLASH)$(SLASH),,$(CONTAINER)$(SLASH)))))
 CONTAINERS = $(foreach CONTAINER,$(CONTAINERS_NEXT),$(subst .,,$(CONTAINER)))
 
+## Docker Container Versions used for Tagging
+RABBITMQ_TAG:=:$(DATETIME)
+POSTGRES_BACKUP_TAG:=:$(DATETIME)
+POSTGRES_TAG:=:$(DATETIME)
+NGINX_TAG:=:$(DATETIME)
+LOGSPOUT_TAG:=:$(DATETIME)
+CONSUL_TAG:=:$(DATETIME)
+VAULT_TAG:=:$(DATETIME)
+TLS_GEN_TAG:=:$(DATETIME)
+REGISTRATOR_TAG:=:$(DATETIME)
+
 .PHONY: containers
 containers: ## Prints the list of Docker containers that will be built, published, etc by this Makefile
 	@echo "Available Docker Containers"
@@ -165,8 +165,8 @@ containers: ## Prints the list of Docker containers that will be built, publishe
 
 %.container:
 	@echo ""
-	$(eval CONTAINER=$*)
-	$(eval CONTAINER_TAG=$($(shell echo $(CONTAINER) | tr a-z A-Z | tr - _)_TAG))
+	$(eval CONTAINER:=$*)
+	$(eval CONTAINER_TAG:=$($(shell echo $(CONTAINER) | tr a-z A-Z | tr - _)_TAG))
 	@echo "$(INFO_COLOR)Processing [$(CONTAINER)]$(NO_COLOR)"
 	$(eval IMAGE:=$(IMAGE_REPO_NAME)$(SLASH)$(CONTAINER)$(CONTAINER_TAG))
 	@echo "--> tag:[$(IMAGE)]"
@@ -181,7 +181,7 @@ docker-build.%: $(ENV_FILE) prereqs-docker %.container  ## Builds a specific con
 	./prepare.sh || true; \
 	$(eval BUILD_ARGS := `cat build.env | sed 's/\(.*\)/--build-arg \1/g' | tr '\n' ' '`) \
 	$(eval export @$(shell cat $(PWD)/$(ENV_FILE))) \
-	docker build $(BUILD_ARGS) -t ${IMAGE} .
+	docker build $(BUILD_ARGS) -t ${IMAGE} . || true
 	@echo "$(OK_COLOR)$@.................................[DONE]$(NO_COLOR)"
 
 .PHONY: docker-push
