@@ -1,6 +1,11 @@
 # 1) Launch Windows Server 2016 With Containers AMI instance
 # 2) Install AWS CLI
-#     https://s3.amazonaws.com/aws-cli/AWSCLI64PY3.msi
+#     Invoke-WebRequest -UseBasicParsing https://s3.amazonaws.com/aws-cli/AWSCLI64PY3.msi -OutFile AWSCLI64PY3.msi
+#     msiexec /i AWSCLI64PY3.msi /q
+#     aws s3 sync s3://artifacts.int.build.briggo.io/3rd-party 3rd-party/ --sse
+#    ./Git-2.23.0-64-bit.exe /VERYSILENT /NORESTART /NOCANCEL /SP- /CLOSEAPPLICATIONS /RESTARTAPPLICATIONS /COMPONENTS="icons,ext\reg\shellhere,assoc,assoc_sh"
+#
+#
 # 3) Make working dir c:\BuildTools
 # 4) Download assets from s3://artifacts.int.build.briggo.io/3rd-party/
 # 5) Run Docker Build
@@ -9,6 +14,11 @@
 #    Invoke-Expression -Command (aws ecr get-login --registry-ids 556085509259)
 #    docker push
 
+
+Invoke-WebRequest -UseBasicParsing  https://s3-us-west-2.amazonaws.com/kinesis-agent-windows/downloads/AWSKinesisTap.1.1.202.1.msi -OutFile AWSKinesisTap.1.1.202.1.msi
+msiexec /i AWSKinesisTap.1.1.168.1.msi /q
+Start-Service -Name AWSKinesisTap
+
 # escape=`
 FROM microsoft/dotnet-framework:4.7.2-runtime
 
@@ -16,7 +26,7 @@ FROM microsoft/dotnet-framework:4.7.2-runtime
 SHELL ["powershell", "-Command", "$ErrorActionPreference = 'Stop'; $ProgressPreference = 'Continue'; $verbosePreference='Continue';"]
 
 #Install NuGet CLI
-ENV NUGET_VERSION 4.4.1
+ENV NUGET_VERSION 5.2.0
 RUN New-Item -Type Directory $Env:ProgramFiles\NuGet; \
     Invoke-WebRequest -UseBasicParsing https://dist.nuget.org/win-x86-commandline/v$Env:NUGET_VERSION/nuget.exe -OutFile $Env:ProgramFiles\NuGet\nuget.exe
 
