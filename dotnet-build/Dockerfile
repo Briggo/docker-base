@@ -54,19 +54,19 @@ RUN @('4.0', '4.5.2', '4.6.2', '4.7.2') \
     }
 
 # Install Cygwin, NodeJS, Git (minimal, for bash)
-RUN Invoke-WebRequest https://chocolatey.org/install.ps1 -UseBasicParsing | Invoke-Expression
-RUN choco install cygwin nodejs git -y
+#RUN Invoke-WebRequest https://chocolatey.org/install.ps1 -UseBasicParsing | Invoke-Expression
+#RUN choco install cygwin nodejs git -y
 
 # Install SemVer and Eclipse Build tools (GNU make)
-RUN npm install --global xpm semver
-RUN xpm install --global @gnu-mcu-eclipse/windows-build-tools; \
-    setx /M PATH $('C:\Users\ContainerAdministrator\AppData\Roaming\xPacks\@gnu-mcu-eclipse\windows-build-tools\2.12.1-1\.content\bin;{0}' -f $env:PATH)
+#RUN npm install --global xpm semver
+#RUN xpm install --global @gnu-mcu-eclipse/windows-build-tools; \
+#    setx /M PATH $('C:\Users\ContainerAdministrator\AppData\Roaming\xPacks\@gnu-mcu-eclipse\windows-build-tools\2.12.1-1\.content\bin;{0}' -f $env:PATH)
 
-# Install wintpy
-COPY winpty-0.4.3-cygwin-2.8.0-x64.zip c:/
-RUN Expand-Archive -Force c:/winpty-0.4.3-cygwin-2.8.0-x64.zip -DestinationPath "c:/";
-
-# Install Git Bash
-COPY Git-2.23.0-64-bit.exe c:/
-RUN c:/Git-2.23.0-64-bit.exe /VERYSILENT /NORESTART /NOCANCEL /SP- /CLOSEAPPLICATIONS /RESTARTAPPLICATIONS /COMPONENTS="icons,ext\reg\shellhere,assoc,assoc_sh"
-#RUN Remove-Item -Force c:/temp/Git-2.23.0-64-bit.exe;
+## Install wintpy
+#COPY winpty-0.4.3-cygwin-2.8.0-x64.zip c:/
+#RUN Expand-Archive -Force c:/winpty-0.4.3-cygwin-2.8.0-x64.zip -DestinationPath "c:/";
+#
+## Install Git Bash
+#COPY Git-2.23.0-64-bit.exe c:/
+#RUN c:/Git-2.23.0-64-bit.exe /VERYSILENT /NORESTART /NOCANCEL /SP- /CLOSEAPPLICATIONS /RESTARTAPPLICATIONS /COMPONENTS="icons,ext\reg\shellhere,assoc,assoc_sh"
+##RUN Remove-Item -Force c:/temp/Git-2.23.0-64-bit.exe;
