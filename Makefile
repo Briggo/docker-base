@@ -157,6 +157,7 @@ CONSUL_TAG:=:$(DATETIME)
 VAULT_TAG:=:$(DATETIME)
 TLS_GEN_TAG:=:$(DATETIME)
 REGISTRATOR_TAG:=:$(DATETIME)
+DOTNET_BUILD_TAG=:$(DATETIME)
 
 .PHONY: containers
 containers: ## Prints the list of Docker containers that will be built, published, etc by this Makefile
