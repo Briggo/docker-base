@@ -14,11 +14,6 @@
 #    Invoke-Expression -Command (aws ecr get-login --registry-ids 556085509259)
 #    docker push
 
-
-Invoke-WebRequest -UseBasicParsing  https://s3-us-west-2.amazonaws.com/kinesis-agent-windows/downloads/AWSKinesisTap.1.1.202.1.msi -OutFile AWSKinesisTap.1.1.202.1.msi
-msiexec /i AWSKinesisTap.1.1.168.1.msi /q
-Start-Service -Name AWSKinesisTap
-
 # escape=`
 FROM microsoft/dotnet-framework:4.7.2-runtime
 
