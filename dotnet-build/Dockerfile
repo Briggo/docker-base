@@ -11,8 +11,8 @@
 # 5) Run Docker Build
 #    https://aws.amazon.com/blogs/devops/extending-aws-codebuild-with-custom-build-environments-for-the-net-framework/
 #    docker build -t 556085509259.dkr.ecr.us-east-1.amazonaws.com/build/dotnet-build:4.8-2016 -m 2GB .
-#    Invoke-Expression -Command (aws ecr get-login --registry-ids 556085509259)
-#    docker push
+#    Invoke-Expression -Command (aws ecr get-login --region us-east-1 --no-include-email --registry-ids 556085509259)
+#    docker push 556085509259.dkr.ecr.us-east-1.amazonaws.com/build/dotnet-build:4.8-2016
 
 # escape=`
 FROM microsoft/dotnet-framework:4.7.2-runtime
